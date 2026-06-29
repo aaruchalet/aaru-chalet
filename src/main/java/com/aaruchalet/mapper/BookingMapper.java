@@ -1,0 +1,22 @@
+package com.aaruchalet.mapper;
+
+import com.aaruchalet.dto.request.BookingRequest;
+import com.aaruchalet.dto.response.BookingResponse;
+import com.aaruchalet.entity.DbBooking;
+import java.util.List;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper(componentModel = "spring")
+public interface BookingMapper {
+
+  @Mapping(target = "customerId", source = "customer.id")
+  @Mapping(target = "roomId", source = "room.id")
+  BookingResponse toDto(DbBooking booking);
+
+  List<BookingResponse> toDto(List<DbBooking> bookings);
+
+  DbBooking toEntity(BookingRequest request);
+
+  List<DbBooking> toEntity(List<BookingRequest> bookings);
+}
