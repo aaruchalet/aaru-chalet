@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: aaru-chalet-deplyment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aaru-chalet
+
+  template:
+    metadata:
+      labels:
+        app: aaru-chalet
+
+    spec:
+      containers:
+        - name: aaru-chalet-container
+          image: aaru-chalet:1.0.1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://aaru-chalet-mysql-service:3306/chalet_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root

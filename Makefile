@@ -11,63 +11,63 @@
 ##################################################
 
 mysql-up:
-	docker compose -p chalet --profile persistent up --build -d mysql
+	docker compose -p chalet up --build -d chalet-db
 
 mysql-down:
-	docker compose -p chalet stop mysql
+	docker compose -p chalet stop chalet-db
 
 mysql-start:
-	docker compose -p chalet start mysql
+	docker compose -p chalet start chalet-db
 
 mysql-stop:
-	docker compose -p chalet stop mysql
+	docker compose -p chalet stop chalet-db
 
 mysql-restart:
-	docker compose -p chalet restart mysql
+	docker compose -p chalet restart chalet-db
 
 mysql-reset:
-	docker compose -p chalet --profile persistent down -v
+	docker compose -p chalet down -v
 
 mysql-logs:
-	docker compose -p chalet logs -f mysql
+	docker compose -p chalet logs -f chalet-db
 
 mysql-shell:
-	docker exec -it chalet-mysql mysql -uroot -proot chalet_db
+	docker exec -it chalet-db mysql -uroot -proot chalet_db
 
 ##################################################
 # MySQL (Temporary)
 ##################################################
 
 mysql-temp-up:
-	docker compose -p chalet --profile temp up --build -d mysql-temp
+	docker compose -p chalet --profile temp up --build -d chalet-db-temp
 
 mysql-temp-down:
-	docker compose -p chalet stop mysql-temp
+	docker compose -p chalet stop chalet-db-temp
 
 mysql-temp-start:
-	docker compose -p chalet start mysql-temp
+	docker compose -p chalet start chalet-db-temp
 
 mysql-temp-stop:
-	docker compose -p chalet stop mysql-temp
+	docker compose -p chalet stop chalet-db-temp
 
 mysql-temp-restart:
-	docker compose -p chalet restart mysql-temp
+	docker compose -p chalet restart chalet-db-temp
 
 mysql-temp-reset:
 	docker compose -p chalet --profile temp down
 
 mysql-temp-logs:
-	docker compose -p chalet logs -f mysql-temp
+	docker compose -p chalet logs -f chalet-db-temp
 
 mysql-temp-shell:
-	docker exec -it chalet-mysql-temp mysql -uroot -proot chalet_db_tmp
+	docker exec -it chalet-db-temp mysql -uroot -proot chalet_db_tmp
 
 ##################################################
 # Spring Boot Application
 ##################################################
 
 app-up:
-	docker compose -p chalet --profile persistent up --build -d aaru-chalet
+	docker compose -p chalet up --build -d aaru-chalet
 
 app-down:
 	docker compose -p chalet stop aaru-chalet
@@ -117,7 +117,7 @@ jenkins-logs:
 ##################################################
 
 stack-up:
-	docker compose -p chalet --profile persistent --profile ci up --build -d
+	docker compose -p chalet --profile ci up --build -d
 
 stack-down:
 	docker compose -p chalet down
@@ -143,3 +143,21 @@ run-dev:
 
 run-qa:
 	./gradlew bootRun --args='--spring.profiles.active=qa'
+
+k8s-mysql-up:
+	kubectl apply -f k8s/mysql-pvc.yaml
+	kubectl apply -f k8s/mysql-deployment.yaml
+	kubectl apply -f k8s/mysql-service.yaml
+
+k8s-app-up:
+	kubectl apply -f k8s/deployment.yaml
+	kubectl apply -f k8s/service.yaml
+
+k8s-down:
+	kubectl delete -f k8s/
+
+k8s-logs:
+	kubectl get deployments
+	kubectl get pods
+	kubectl get services
+
