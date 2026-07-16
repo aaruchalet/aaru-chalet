@@ -1,50 +1,66 @@
 services:
-  mysql:
-    image: mysql:8.4
-    container_name: chalet-mysql
 
+  aaru-chalet:
+    container_name: aaru-chalet
+    image: aaru-chalet:1.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      chalet-db:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://chalet-db:3306/chalet_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    restart: unless-stopped
+
+  chalet-db:
+    container_name: chalet-db
+    image: mysql:8.4
     profiles:
       - persistent
-
+    ports:
+      - "2211:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: chalet_db
-
-    ports:
-      - "2211:3306"
-
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
-      - mysql-data:/var/lib/mysql_data
-
+      - aaru-chalet-mysql:/var/lib/mysql
     restart: unless-stopped
 
-  mysql-temp:
+  chalet-db-temp:
+    container_name: chalet-db-temp
     image: mysql:8.4
-    container_name: chalet-mysql-temp
-
     profiles:
       - temp
-
+    ports:
+      - "2212:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: chalet_db_tmp
 
-    ports:
-      - "2212:3306"
-
   jenkins:
+    container_name: chalet-jenkins
+    image: jenkins/jenkins:lts-jdk21
     profiles:
       - ci
-    image: jenkins/jenkins:lts-jdk21
-    container_name: chalet-jenkins
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      - jenkins-data:/var/jenkins_home
+      - aaru-chalet-jenkins:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
 volumes:
-  mysql-data:
-  jenkins-data:
+  aaru-chalet-mysql:
+  aaru-chalet-jenkins:

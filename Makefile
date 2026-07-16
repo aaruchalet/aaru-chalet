@@ -1,105 +1,145 @@
 .PHONY: \
-	persistent-up \
-	persistent-down \
-	persistent-start \
-	persistent-stop \
-	persistent-restart \
-	persistent-logs \
-	persistent-shell \
-	persistent-reset \
-	temp-up \
-	temp-down \
-	temp-start \
-	temp-stop \
-	temp-restart \
-	temp-logs \
-	temp-shell \
-	all-down \
-	all-reset
+	mysql-up mysql-down mysql-start mysql-stop mysql-restart mysql-reset mysql-logs mysql-shell \
+	mysql-temp-up mysql-temp-down mysql-temp-start mysql-temp-stop mysql-temp-restart mysql-temp-reset mysql-temp-logs mysql-temp-shell \
+	app-up app-down app-start app-stop app-restart app-build app-logs \
+	jenkins-up jenkins-down jenkins-start jenkins-stop jenkins-restart jenkins-reset jenkins-logs \
+	stack-up stack-down stack-reset stack-status \
+	build clean run-dev run-qa
 
-########################################
-# Persistent Database
-########################################
+##################################################
+# MySQL (Persistent)
+##################################################
 
-persistent-up:
-	docker compose -p dev --profile persistent up -d
+mysql-up:
+	docker compose -p chalet --profile persistent up --build -d mysql
 
-persistent-down:
-	docker compose -p dev --profile persistent down
+mysql-down:
+	docker compose -p chalet stop mysql
 
+mysql-start:
+	docker compose -p chalet start mysql
 
-persistent-start:
-	docker compose -p dev --profile persistent start mysql
+mysql-stop:
+	docker compose -p chalet stop mysql
 
-persistent-stop:
-	docker compose -p dev --profile persistent stop mysql
+mysql-restart:
+	docker compose -p chalet restart mysql
 
-persistent-restart:
-	docker compose -p dev --profile persistent restart mysql
+mysql-reset:
+	docker compose -p chalet --profile persistent down -v
 
-persistent-logs:
-	docker compose -p dev logs -p persistent logs -f mysql
+mysql-logs:
+	docker compose -p chalet logs -f mysql
 
-persistent-reset:
-	docker compose -p dev --profile persistent down -v
+mysql-shell:
+	docker exec -it chalet-mysql mysql -uroot -proot chalet_db
 
+##################################################
+# MySQL (Temporary)
+##################################################
 
-########################################
-# Temporary Database
-########################################
+mysql-temp-up:
+	docker compose -p chalet --profile temp up --build -d mysql-temp
 
-temp-up:
-	docker compose -p qa --profile temp up -d
+mysql-temp-down:
+	docker compose -p chalet stop mysql-temp
 
-temp-down:
-	docker compose -p qa --profile temp down
+mysql-temp-start:
+	docker compose -p chalet start mysql-temp
 
-temp-start:
-	docker compose -p qa --profile temp start mysql-temp
+mysql-temp-stop:
+	docker compose -p chalet stop mysql-temp
 
-temp-stop:
-	docker compose -p qa --profile temp stop mysql-temp
+mysql-temp-restart:
+	docker compose -p chalet restart mysql-temp
 
-temp-restart:
-	docker compose -p qa --profile temp restart mysql-temp
+mysql-temp-reset:
+	docker compose -p chalet --profile temp down
 
-temp-logs:
-	docker compose -p qa logs -f mysql-temp
+mysql-temp-logs:
+	docker compose -p chalet logs -f mysql-temp
+
+mysql-temp-shell:
+	docker exec -it chalet-mysql-temp mysql -uroot -proot chalet_db_tmp
+
+##################################################
+# Spring Boot Application
+##################################################
+
+app-up:
+	docker compose -p chalet --profile persistent up --build -d aaru-chalet
+
+app-down:
+	docker compose -p chalet stop aaru-chalet
+
+app-start:
+	docker compose -p chalet start aaru-chalet
+
+app-stop:
+	docker compose -p chalet stop aaru-chalet
+
+app-restart:
+	docker compose -p chalet restart aaru-chalet
+
+app-build:
+	docker compose -p chalet build aaru-chalet
+
+app-logs:
+	docker compose -p chalet logs -f aaru-chalet
+
+##################################################
+# Jenkins
+##################################################
 
 jenkins-up:
-	docker compose -p dev --profile ci up -d
-
-
-########################################
-# Jenkins
-########################################
+	docker compose -p chalet --profile ci up -d jenkins
 
 jenkins-down:
-	docker compose -p dev --profile ci down
+	docker compose -p chalet stop jenkins
+
+jenkins-start:
+	docker compose -p chalet start jenkins
+
+jenkins-stop:
+	docker compose -p chalet stop jenkins
+
+jenkins-restart:
+	docker compose -p chalet restart jenkins
 
 jenkins-reset:
-	docker compose -p dev --profile ci down -v
+	docker compose -p chalet --profile ci down -v
 
+jenkins-logs:
+	docker compose -p chalet logs -f jenkins
 
-########################################
-# All Containers start, stop, reset
-########################################
+##################################################
+# Complete Stack
+##################################################
 
-all-up:
-	docker compose -p dev --profile persistent up -d
-	docker compose -p qa --profile temp up -d
-	docker compose -p dev --profile ci up -d
+stack-up:
+	docker compose -p chalet --profile persistent --profile ci up --build -d
 
-all-down:
-	docker compose -p dev down
-	docker compose -p qa down
+stack-down:
+	docker compose -p chalet down
 
-all-reset:
-	docker compose -p dev down -v
-	docker compose -p qa down -v
+stack-reset:
+	docker compose -p chalet down -v
 
-build-dev:
+stack-status:
+	docker compose -p chalet ps
+
+##################################################
+# Gradle
+##################################################
+
+clean:
+	./gradlew clean
+
+build:
+	./gradlew clean build
+
+run-dev:
 	./gradlew bootRun --args='--spring.profiles.active=dev'
 
-build-qa:
+run-qa:
 	./gradlew bootRun --args='--spring.profiles.active=qa'
