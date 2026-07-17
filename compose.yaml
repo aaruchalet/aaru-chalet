@@ -2,7 +2,7 @@ services:
 
   aaru-chalet:
     container_name: aaru-chalet
-    image: aaru-chalet:1.0.1
+    image: aaru-chalet:1.0.2
     build:
       context: .
       dockerfile: Dockerfile
