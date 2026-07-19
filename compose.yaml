@@ -2,7 +2,7 @@ services:
 
   aaru-chalet:
     container_name: aaru-chalet
-    image: aaru-chalet:1.0.2
+    image: aaru-chalet:1.0.4
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,6 +15,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://chalet-db:3306/chalet_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
   chalet-db:

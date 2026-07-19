@@ -153,6 +153,14 @@ k8s-app-up:
 	kubectl apply -f k8s/deployment.yaml
 	kubectl apply -f k8s/service.yaml
 
+k8s-up:
+	kubectl apply -f k8s/configmap.yaml
+	kubectl apply -f k8s/mysql-pvc.yaml
+	kubectl apply -f k8s/mysql-deployment.yaml
+	kubectl apply -f k8s/mysql-service.yaml
+	kubectl apply -f k8s/deployment.yaml
+	kubectl apply -f k8s/service.yaml
+
 k8s-down:
 	kubectl delete -f k8s/
 
