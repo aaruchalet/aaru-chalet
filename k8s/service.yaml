@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: aaru-chalet-service
+  name: chalet-core-service
 
 spec:
   selector:
-    app: aaru-chalet
+    app: chalet-core
 
   ports:
     - port: 8080

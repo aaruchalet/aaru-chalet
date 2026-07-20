@@ -2,19 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: aaru-chalet-mysql-deployment
+  name: chalet-core-mysql-deployment
 
 spec:
   replicas: 1
 
   selector:
     matchLabels:
-      app: aaru-chalet-mysql
+      app: chalet-core-mysql
 
   template:
     metadata:
       labels:
-        app: aaru-chalet-mysql
+        app: chalet-core-mysql
 
     spec:
       containers:
@@ -22,6 +22,7 @@ spec:
           image: mysql:8.4
           ports:
             - containerPort: 3306
+
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: root
@@ -66,4 +67,4 @@ spec:
       volumes:
         - name: mysql-storage
           persistentVolumeClaim:
-            claimName: aaru-chalet-mysql-pvc
+            claimName: chalet-core-mysql-pvc

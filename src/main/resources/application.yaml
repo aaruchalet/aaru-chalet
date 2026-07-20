@@ -1,6 +1,6 @@
 spring:
   application:
-    name: aaru-chalet
+    name: chalet-core
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}

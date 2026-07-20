@@ -1,6 +1,11 @@
 FROM eclipse-temurin:21-jre
+
 LABEL maintainer="manjeet.kumar"
-WORKDIR /opt/aaru-chalet
-COPY build/libs/*.jar aaru-chalet.jar
+
+WORKDIR /opt/chalet-core
+
+COPY build/libs/*.jar chalet-core.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","aaru-chalet.jar"]
+
+ENTRYPOINT ["java", "-jar", "chalet-core.jar"]
