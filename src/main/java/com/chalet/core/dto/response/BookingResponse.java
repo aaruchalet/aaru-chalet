@@ -1,0 +1,14 @@
+package com.chalet.core.dto.response;
+
+import com.chalet.core.enums.BookingStatus;
+import java.time.LocalDate;
+
+public record BookingResponse(
+        Long id,
+        Long customerId,
+        Long roomId,
+        LocalDate checkInDate,
+        LocalDate checkOutDate,
+        BookingStatus bookingStatus
+) {
+}

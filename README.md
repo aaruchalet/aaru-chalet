@@ -1,6 +1,7 @@
 # Aaru Chalet
 
-A Spring Boot-based Resort Management System demonstrating modern backend development practices, containerization, Kubernetes deployment, and CI/CD.
+A Spring Boot-based Resort Management System demonstrating modern backend development practices, containerization,
+Kubernetes deployment, and CI/CD.
 
 ## Tech Stack
 

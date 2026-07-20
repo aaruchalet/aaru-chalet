@@ -2,18 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: aaru-chalet-deployment
+  name: chalet-core-deployment
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aaru-chalet
+      app: chalet-core
 
   template:
     metadata:
       labels:
-        app: aaru-chalet
+        app: chalet-core
 
     spec:
       initContainers:
@@ -23,21 +23,21 @@ spec:
             - sh
             - -c
             - |
-              until mysqladmin ping -h aaru-chalet-mysql-service -uroot -proot --silent; do
+              until mysqladmin ping -h chalet-core-mysql-service -uroot -proot --silent; do
                 echo "Waiting for MySQL..."
                 sleep 2
               done
 
       containers:
-        - name: aaru-chalet-container
-          image: aaru-chalet:1.0.4
+        - name: chalet-core-container
+          image: chalet-core:1.0.5
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
 
           envFrom:
             - configMapRef:
-                name: aaru-chalet-config
+                name: chalet-core-config
 
           startupProbe:
             httpGet:

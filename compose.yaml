@@ -1,8 +1,8 @@
 services:
 
-  aaru-chalet:
-    container_name: aaru-chalet
-    image: aaru-chalet:1.0.5
+  chalet-core:
+    container_name: chalet-core
+    image: chalet-core:1.0.5
     build:
       context: .
       dockerfile: Dockerfile
@@ -38,7 +38,7 @@ services:
       retries: 5
       start_period: 30s
     volumes:
-      - aaru-chalet-mysql:/var/lib/mysql
+      - chalet-core-mysql:/var/lib/mysql
     restart: unless-stopped
 
   chalet-db-temp:
@@ -61,10 +61,10 @@ services:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      - aaru-chalet-jenkins:/var/jenkins_home
+      - chalet-core-jenkins:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
 volumes:
-  aaru-chalet-mysql:
-  aaru-chalet-jenkins:
+  chalet-core-mysql:
+  chalet-core-jenkins:

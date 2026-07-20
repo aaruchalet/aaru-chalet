@@ -4,7 +4,8 @@
 	app-up app-down app-start app-stop app-restart app-build app-logs \
 	jenkins-up jenkins-down jenkins-start jenkins-stop jenkins-restart jenkins-reset jenkins-logs \
 	stack-up stack-down stack-reset stack-status \
-	build clean run-dev run-qa
+	build clean run-dev run-qa \
+	k8s-mysql-up k8s-app-up k8s-up k8s-down k8s-logs
 
 ##################################################
 # MySQL (Persistent)
@@ -67,25 +68,25 @@ mysql-temp-shell:
 ##################################################
 
 app-up:
-	docker compose -p chalet up --build -d aaru-chalet
+	docker compose -p chalet up --build -d chalet-core
 
 app-down:
-	docker compose -p chalet stop aaru-chalet
+	docker compose -p chalet stop chalet-core
 
 app-start:
-	docker compose -p chalet start aaru-chalet
+	docker compose -p chalet start chalet-core
 
 app-stop:
-	docker compose -p chalet stop aaru-chalet
+	docker compose -p chalet stop chalet-core
 
 app-restart:
-	docker compose -p chalet restart aaru-chalet
+	docker compose -p chalet restart chalet-core
 
 app-build:
-	docker compose -p chalet build aaru-chalet
+	docker compose -p chalet build chalet-core
 
 app-logs:
-	docker compose -p chalet logs -f aaru-chalet
+	docker compose -p chalet logs -f chalet-core
 
 ##################################################
 # Jenkins
@@ -144,12 +145,17 @@ run-dev:
 run-qa:
 	./gradlew bootRun --args='--spring.profiles.active=qa'
 
+##################################################
+# Kubernetes
+##################################################
+
 k8s-mysql-up:
 	kubectl apply -f k8s/mysql-pvc.yaml
 	kubectl apply -f k8s/mysql-deployment.yaml
 	kubectl apply -f k8s/mysql-service.yaml
 
 k8s-app-up:
+	kubectl apply -f k8s/configmap.yaml
 	kubectl apply -f k8s/deployment.yaml
 	kubectl apply -f k8s/service.yaml
 
@@ -168,4 +174,3 @@ k8s-logs:
 	kubectl get deployments
 	kubectl get pods
 	kubectl get services
-
