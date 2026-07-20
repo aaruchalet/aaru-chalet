@@ -34,3 +34,6 @@ jobs:
           docker build \
           -t aaru-chalet:${{ github.sha }} \
           .
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4

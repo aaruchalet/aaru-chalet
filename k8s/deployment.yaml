@@ -28,9 +28,12 @@ spec:
                 sleep 2
               done
 
+      imagePullSecrets:
+        - name: ecr-secret
+
       containers:
         - name: chalet-core-container
-          image: chalet-core:1.0.5
+          image: 712532372065.dkr.ecr.ap-south-1.amazonaws.com/chalet-core:1.0.5
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
