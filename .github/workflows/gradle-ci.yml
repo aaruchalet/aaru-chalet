@@ -28,3 +28,9 @@ jobs:
 
       - name: Build and Run Tests
         run: ./gradlew clean build
+
+      - name: Build Docker Image
+        run: |
+          docker build \ 
+          -t aaru-chalet:${{ github.sha }} \
+          .

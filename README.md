@@ -170,7 +170,6 @@ Endpoint
 
 ```
 /actuator/health
-/actuator/health/info
 ```
 
 ---
