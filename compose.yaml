@@ -2,7 +2,7 @@ services:
 
   chalet-core:
     container_name: chalet-core
-    image: chalet-core:1.0.5
+    image: chalet-core:1.0.6
     build:
       context: .
       dockerfile: Dockerfile

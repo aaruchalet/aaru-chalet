@@ -5,7 +5,7 @@ metadata:
   name: chalet-core-mysql-deployment
 
 spec:
-  replicas: 1
+  replicas: {{ .Values.mysql.replicaCount }}
 
   selector:
     matchLabels:
@@ -19,16 +19,16 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:8.4
+          image: {{ .Values.mysql.image }}
           ports:
-            - containerPort: 3306
+            - containerPort: {{ .Values.mysql.service.port }}
 
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: root
+              value: {{ .Values.mysql.password | quote }}
 
             - name: MYSQL_DATABASE
-              value: chalet_db
+              value: {{ .Values.mysql.database | quote }}
 
           startupProbe:
             exec:
