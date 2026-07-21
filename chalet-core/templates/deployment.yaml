@@ -5,7 +5,7 @@ metadata:
   name: chalet-core-deployment
 
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: chalet-core
@@ -18,7 +18,7 @@ spec:
     spec:
       initContainers:
         - name: wait-for-mysql
-          image: mysql:8.4
+          image: {{ .Values.mysql.image }}
           command:
             - sh
             - -c
@@ -33,10 +33,10 @@ spec:
 
       containers:
         - name: chalet-core-container
-          image: 712532372065.dkr.ecr.ap-south-1.amazonaws.com/chalet-core:1.0.5
-          imagePullPolicy: Never
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 8080
+            - containerPort: {{ .Values.service.port }}
 
           envFrom:
             - configMapRef:

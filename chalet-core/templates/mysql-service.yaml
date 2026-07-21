@@ -10,7 +10,7 @@ spec:
 
   ports:
     - protocol: TCP
-      port: 3306
-      targetPort: 3306
+      port: {{ .Values.mysql.service.port }}
+      targetPort: {{ .Values.mysql.service.port }}
 
-  type: ClusterIP
+  type: {{ .Values.mysql.service.type }}
