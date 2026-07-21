@@ -1,18 +1,19 @@
 # 🏔️ Chalet Core
 
-<p align="center">
-  <strong>A cloud-native Spring Boot backend for Resort Management demonstrating modern Java development, containerization, Kubernetes orchestration, and CI/CD with GitHub Actions & AWS.</strong>
+<p >
+  <strong>A cloud-native Spring Boot backend for a Resort Management System demonstrating modern Java development, containerization, Kubernetes orchestration, and CI/CD using GitHub Actions and AWS.</strong>
 </p>
 
-<p align="center">
+<p >
 
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=springboot)
 ![Gradle](https://img.shields.io/badge/Gradle-9.x-02303A?style=for-the-badge&logo=gradle)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Helm](https://img.shields.io/badge/Helm-0F1689?style=for-the-badge&logo=helm)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions)
-![AWS](https://img.shields.io/badge/AWS-ECR-FF9900?style=for-the-badge&logo=amazonaws)
+![AWS ECR](https://img.shields.io/badge/AWS-ECR-FF9900?style=for-the-badge&logo=amazonaws)
 
 </p>
 
@@ -36,16 +37,13 @@
         │                      │                      │
         └──────────────┬───────┴──────────────────────┘
                        ▼
-                 Amazon ECR Registry
+                Amazon ECR Registry
                        │
                        ▼
-            Kubernetes Cluster (Planned)
+                  Helm Chart
                        │
                        ▼
-              Spring Boot Application
-                       │
-                       ▼
-                     MySQL
+          Amazon EKS Deployment (Next Phase)
 ```
 
 ---
@@ -60,11 +58,10 @@
 - Flyway Database Migrations
 - Spring Boot Actuator
 - Dockerized Application
-- Kubernetes Deployment
-- Persistent MySQL Storage
-- ConfigMap-based Configuration
-- GitHub Actions CI
-- Amazon ECR Integration
+- Kubernetes-ready Deployment using Helm
+- Persistent MySQL Storage for Local Development
+- Automated CI Pipeline with GitHub Actions
+- Docker Image Publishing to Amazon ECR
 
 ---
 
@@ -76,12 +73,12 @@
 | Framework | Spring Boot 3 |
 | Build Tool | Gradle |
 | Database | MySQL 8.4 |
-| Migration | Flyway |
+| Database Migration | Flyway |
 | Containerization | Docker |
 | Orchestration | Kubernetes |
+| Package Manager | Helm |
 | CI | GitHub Actions |
-| Container Registry | Amazon ECR |
-| Deployment | Helm *(In Progress)* |
+| Container Registry | Amazon Elastic Container Registry (ECR) |
 | Cloud | AWS |
 
 ---
@@ -95,14 +92,10 @@ chalet-core/
 │   └── test/
 │
 ├── helm/
-│
-├── k8s/
-│   ├── configmap.yaml
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── mysql-deployment.yaml
-│   ├── mysql-service.yaml
-│   └── mysql-pvc.yaml
+│   └── chalet-core/
+│       ├── Chart.yaml
+│       ├── values.yaml
+│       └── templates/
 │
 ├── .github/
 │   └── workflows/
@@ -138,7 +131,7 @@ cd chalet-core
 
 ---
 
-## Run
+## Run Locally
 
 ```bash
 ./gradlew bootRun
@@ -150,7 +143,7 @@ Application
 http://localhost:8080
 ```
 
-Health Check
+Health Endpoint
 
 ```
 http://localhost:8080/actuator/health
@@ -174,68 +167,52 @@ docker compose up -d
 
 ---
 
-# ☸️ Kubernetes
+# ☸️ Helm Deployment
 
-Deploy
+The application is packaged and deployed using **Helm**, Kubernetes' package manager.
+
+Install
 
 ```bash
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/mysql-pvc.yaml
-kubectl apply -f k8s/mysql-deployment.yaml
-kubectl apply -f k8s/mysql-service.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
+helm install chalet-core ./helm/chalet-core
+```
+
+Upgrade
+
+```bash
+helm upgrade chalet-core ./helm/chalet-core
 ```
 
 Verify
 
 ```bash
-kubectl get all
-```
+kubectl get pods
 
-Logs
+kubectl get deployments
 
-```bash
-kubectl logs deployment/chalet-core-deployment
+kubectl get services
 ```
 
 ---
 
-# 🔄 CI Pipeline
+# 🔄 Continuous Integration Pipeline
 
-```text
-Git Push / Pull Request
-            │
-            ▼
-      Checkout Source
-            │
-            ▼
-      Setup Java 21
-            │
-            ▼
-      Gradle Build
-            │
-            ▼
-      Docker Build
-            │
-            ▼
- AWS Authentication
-            │
-            ▼
- Login to Amazon ECR
-            │
-            ▼
- Docker Image Push
-            │
-            ▼
- Amazon Elastic Container Registry
-```
+Every push or pull request automatically performs:
+
+- Checkout Repository
+- Setup Java 21
+- Gradle Build
+- Build Docker Image
+- Authenticate with AWS
+- Login to Amazon ECR
+- Tag Docker Image
+- Push Docker Image to Amazon ECR
 
 ---
 
 # 📦 Docker Images
 
-Each Docker image is tagged with the Git commit SHA.
+Every Docker image is uniquely tagged using the Git commit SHA.
 
 Example
 
@@ -243,11 +220,25 @@ Example
 712532372065.dkr.ecr.ap-south-1.amazonaws.com/chalet-core:<commit-sha>
 ```
 
+This ensures every build is reproducible and traceable.
+
+---
+
+# 🗄️ Database
+
+- MySQL 8.4
+- Flyway Database Migrations
+- Hibernate Validation (`ddl-auto=validate`)
+- Persistent storage for local development using Docker Volumes and Kubernetes Persistent Volumes
+- Production deployments can be configured to use an external database (e.g. Amazon RDS)
+
 ---
 
 # 🩺 Health Checks
 
-Spring Boot Actuator endpoints
+Spring Boot Actuator provides health endpoints for Kubernetes.
+
+Endpoint
 
 ```
 /actuator/health
@@ -261,37 +252,41 @@ Used for
 
 ---
 
-# 🗺️ Roadmap
+# 🛣️ Roadmap
 
-## Completed
+## ✅ Completed
 
-- ✅ Spring Boot Backend
-- ✅ REST APIs
-- ✅ MySQL Integration
-- ✅ Flyway Migrations
-- ✅ Docker
-- ✅ Docker Compose
-- ✅ Kubernetes
-- ✅ ConfigMaps
-- ✅ GitHub Actions CI
-- ✅ Amazon ECR Integration
+- Spring Boot Backend
+- REST APIs
+- MySQL Integration
+- Flyway Migrations
+- Docker Support
+- Docker Compose
+- Kubernetes Setup
+- Helm Charts
+- GitHub Actions CI
+- Amazon ECR Integration
 
-## Upcoming
+## 🚧 In Progress
 
-- ⏳ Kubernetes Secrets
-- ⏳ Helm Charts
-- ⏳ Amazon EKS Deployment
-- ⏳ Ingress Controller
-- ⏳ Horizontal Pod Autoscaler
-- ⏳ Prometheus
-- ⏳ Grafana
-- ⏳ Centralized Logging
-- ⏳ SonarQube
-- ⏳ Trivy Security Scanning
+- Amazon EKS Deployment
+- Helm-based Continuous Deployment (CD)
+
+## 📌 Planned
+
+- Kubernetes Secrets
+- Ingress Controller
+- Horizontal Pod Autoscaler (HPA)
+- Prometheus Monitoring
+- Grafana Dashboards
+- Centralized Logging
+- SonarQube Analysis
+- Trivy Image Scanning
+- Blue-Green / Rolling Deployments
 
 ---
 
-# 📈 Future CI/CD Pipeline
+# 📈 CI/CD Pipeline
 
 ```text
 Developer
@@ -302,26 +297,19 @@ GitHub Repository
      ▼
 GitHub Actions
      │
-     ▼
-Gradle Build
-     │
-     ▼
-Docker Build
-     │
+     ├── Checkout
+     ├── Gradle Build
+     ├── Docker Build
+     ├── AWS Authentication
+     ├── Push Docker Image
      ▼
 Amazon ECR
      │
      ▼
-Amazon EKS
+Helm
      │
      ▼
-Helm Upgrade
-     │
-     ▼
-Rolling Deployment
-     │
-     ▼
-Live Application
+Amazon EKS (Next Phase)
 ```
 
 ---
