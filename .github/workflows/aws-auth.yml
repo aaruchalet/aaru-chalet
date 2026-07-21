@@ -23,6 +23,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t aaru-chalet:${{ github.sha }} \
+            .
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -32,3 +38,26 @@ jobs:
 
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag Docker Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag \
+            aaru-chalet:${IMAGE_TAG} \
+            ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+
+      - name: Push Docker Image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push \
+            ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
